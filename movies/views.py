@@ -34,7 +34,7 @@ class MovieViewDetail(APIView):
         serializer = MovieSerializer(movie)
         return Response(serializer.data, status.HTTP_200_OK)
 
-    def path(self, request, movie_id):
+    def patch(self, request, movie_id):
         try:
             movie = Movie.objects.get(pk=movie_id)
         except Movie.DoesNotExist:
