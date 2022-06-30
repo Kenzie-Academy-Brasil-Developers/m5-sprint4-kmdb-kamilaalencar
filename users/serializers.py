@@ -1,23 +1,21 @@
-from asyncore import read, write
 from rest_framework import serializers
 from users.models import User
 
 class UserSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    email = serializers.EmailField(write_only=True)
-    password = serializers.CharField()
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
     first_name = serializers.CharField(max_length=50)
     last_name =serializers.CharField(max_length=50)
-    date_joined = serializers.DateField()
-    updated_at = serializers.DateField(read_only=True)
+    date_joined = serializers.DateTimeField(read_only=True)
+    updated_at = serializers.DateTimeField(read_only=True)
 
 
-    def vaidate_email(self, value):
+    def validate_email(self, value):
         norm_email = value.lower()
         if User.objects.filter(email__iexact=norm_email).exists():
-            raise serializers.ValidationError({"email":["email already exists"]})
+            raise serializers.ValidationError({"email already exists"})
         return norm_email
 
     def create(self, validated_data):
-        user = User.objects.create_use(**validated_data)
-        return user
+        return User.objects.create_user(**validated_data)
