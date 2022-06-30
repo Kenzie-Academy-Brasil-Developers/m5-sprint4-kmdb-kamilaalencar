@@ -1,7 +1,7 @@
 from rest_framework.views import APIView, Response, status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.authentication import TokenAuthentication
 from .permissions import UserCustomPermission
 from .models import User
 from .serializers import UserSerializer
@@ -9,7 +9,7 @@ from .serializers import LoginUserSerializer
 
 
 class UserView(APIView):
-    authentication_classes = [JWTAuthentication]
+    authentication_classes = [TokenAuthentication]
     permission_classes = [UserCustomPermission]
  
     def post(self, request):
@@ -21,13 +21,13 @@ class UserView(APIView):
 
     def get(self, request):
         users = User.objects.all()
-        serializer = UserSerializer(users)
+        serializer = UserSerializer(users, many = True)
         return Response(serializer.data, status.HTTP_200_OK)
 
 class UserViewDetail(APIView):
-    authentication_classes = [JWTAuthentication]
+    authentication_classes = [TokenAuthentication]
     permission_classes = [UserCustomPermission]
-    
+
     def get(self, request, user_id):
         try: 
             user = User.objects.get(pk=user_id)

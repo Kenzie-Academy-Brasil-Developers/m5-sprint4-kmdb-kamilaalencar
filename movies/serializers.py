@@ -24,11 +24,11 @@ class MovieSerializer(serializers.Serializer):
         return movie
 
     def update(self, instance:Movie, validated_data:dict):
-        for key, value in validated_data.item():
+        for key, value in validated_data.items():
             if key == 'genres' and type(value) == list:
                 for genre in value:
                     genre_obj, created = Genre.objects.get_or_create(**genre)
-                    instance.genres.add(**genre_obj)
+                    instance.genres.add(genre_obj)
             else:
                 setattr(instance, key, value)
         instance.save()

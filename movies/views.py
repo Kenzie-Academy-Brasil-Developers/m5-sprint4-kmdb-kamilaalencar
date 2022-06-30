@@ -1,13 +1,11 @@
-from functools import partial
 from rest_framework.views import APIView, Response, status
-from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from rest_framework.authentication import TokenAuthentication
 from .permissions import MovieCustomPermission
 from .models import Movie
 from .serializers import MovieSerializer
 
 class MovieView(APIView):
-    authentication_classes = [JWTAuthentication]
+    authentication_classes = [TokenAuthentication]
     permission_classes = [MovieCustomPermission]
 
     def post(self, request):
@@ -22,35 +20,35 @@ class MovieView(APIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
 class MovieViewDetail(APIView):
-    authentication_classes = [JWTAuthentication]
+    authentication_classes = [TokenAuthentication]
     permission_classes = [MovieCustomPermission]
     
     def get(self, request, movie_id):
         try:
             movie = Movie.objects.get(pk=movie_id)
         except Movie.DoesNotExist:
-            return Response({'message':'Movie not found'})
+            return Response({'message':'Movie not found'}, status.HTTP_404_NOT_FOUND)
 
         serializer = MovieSerializer(movie)
         return Response(serializer.data, status.HTTP_200_OK)
+
 
     def patch(self, request, movie_id):
         try:
             movie = Movie.objects.get(pk=movie_id)
         except Movie.DoesNotExist:
-            return Response({'message':'Movie not found'})
+            return Response({'message':'Movie not found'}, status.HTTP_404_NOT_FOUND)
 
         serializer = MovieSerializer(movie, request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
         return Response(serializer.data, status.HTTP_200_OK)
     
     def delete(self, request, movie_id):
         try:
             movie = Movie.objects.get(pk=movie_id)
         except Movie.DoesNotExist:
-            return Response({'message':'Movie not found'})
+            return Response({'message':'Movie not found'}, status.HTTP_404_NOT_FOUND)
         
         movie.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
