@@ -17,7 +17,7 @@ class MovieView(APIView):
 class MovieViewDetail(APIView):
     def get(self, request, movie_id):
         try:
-            movie = Movie.object.get(pk=movie_id)
+            movie = Movie.objects.get(pk=movie_id)
         except Movie.DoesNotExist:
             return Response({'message':'Movie not found'})
         serializer = MovieSerializer(movie)
