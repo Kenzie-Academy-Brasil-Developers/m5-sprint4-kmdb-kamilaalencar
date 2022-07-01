@@ -28,16 +28,6 @@ class ReviewView(APIView):
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
-class AllReviewsView(APIView):
-    def get(self, request):
-        reviews = Review.objects.all()
-        serializer = ReviewSerializer(reviews, many=True)
-        return Response(serializer.data, status.HTTP_200_OK)
-
-class ReviewViewDetail(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [ReviewCustomPermission]
-    
     def delete(self, request, review_id):
         try:
             review = Review.objects.get(pk=review_id)
@@ -46,3 +36,22 @@ class ReviewViewDetail(APIView):
         
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class AllReviewsView(APIView):
+    def get(self, request):
+        reviews = Review.objects.all()
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+# class ReviewViewDetail(APIView):
+#     authentication_classes = [TokenAuthentication]
+#     permission_classes = [ReviewCustomPermission]
+
+#     def delete(self, request, review_id):
+#         try:
+#             review = Review.objects.get(pk=review_id)
+#         except Review.DoesNotExist:
+#             return Response({'message':'Review not found'}, status.HTTP_404_NOT_FOUND)
+        
+#         review.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
