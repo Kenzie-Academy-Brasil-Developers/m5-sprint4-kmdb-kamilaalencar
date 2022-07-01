@@ -15,6 +15,6 @@ class Review(models.Model):
         choices=RecomendationReview.choices,
         default=RecomendationReview.NO_OPINION
         )
-    movies = models.ForeignKey('movies.Movie', on_delete=models.CASCADE, related_name='reviews')
-    users = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='reviews')
+    movie = models.ForeignKey('movies.Movie', on_delete=models.CASCADE, related_name='reviews')
+    critic = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='reviews')
 
