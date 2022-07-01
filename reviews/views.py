@@ -1,12 +1,13 @@
 from rest_framework.views import APIView, Response, status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.pagination import PageNumberPagination
 from .permissions import ReviewCustomPermission
 from .models import Review
 from .serializers import ReviewSerializer
 from movies.models import Movie
 
 
-class ReviewView(APIView):
+class ReviewView(APIView, PageNumberPagination):
     authentication_classes = [TokenAuthentication]
     permission_classes = [ReviewCustomPermission]
 
@@ -25,8 +26,10 @@ class ReviewView(APIView):
         reviews = Review.objects.filter(movie_id=movie_id)
         if not reviews:
             return Response({'message':'Reviews of this movie not found'}, status.HTTP_404_NOT_FOUND)
-        serializer = ReviewSerializer(reviews, many=True)
-        return Response(serializer.data, status.HTTP_200_OK)
+        result_page = self.paginate_queryset(reviews, request, view=self)
+        serializer = ReviewSerializer(result_page, many=True)
+
+        return self.get_paginated_response(serializer.data)
 
     def delete(self, request, review_id):
         try:
@@ -37,21 +40,10 @@ class ReviewView(APIView):
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class AllReviewsView(APIView):
+class AllReviewsView(APIView, PageNumberPagination):
     def get(self, request):
         reviews = Review.objects.all()
-        serializer = ReviewSerializer(reviews, many=True)
-        return Response(serializer.data, status.HTTP_200_OK)
+        result_page = self.paginate_queryset(reviews, request, view=self)
+        serializer = ReviewSerializer(result_page, many=True)
+        return self.get_paginated_response(serializer.data)
 
-# class ReviewViewDetail(APIView):
-#     authentication_classes = [TokenAuthentication]
-#     permission_classes = [ReviewCustomPermission]
-
-#     def delete(self, request, review_id):
-#         try:
-#             review = Review.objects.get(pk=review_id)
-#         except Review.DoesNotExist:
-#             return Response({'message':'Review not found'}, status.HTTP_404_NOT_FOUND)
-        
-#         review.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
